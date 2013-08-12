@@ -1,0 +1,10 @@
+- Open file dialog
+- Load srt file
+- Make Play/Pause/Stop work
+- Use graphics instead of text for buttons
+- Use string resources
+- Enable dragging move grip to change app location
+- Have better UI for move grip
+- Support restore mode
+- Enable colors/font cusomization
+- Show current time in label, and enable micro-decrease/increase
