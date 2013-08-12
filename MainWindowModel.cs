@@ -6,10 +6,9 @@ namespace SubtitlesRunner
 {
     public class MainWindowModel : INotifyPropertyChanged
     {
-        public MainWindowModel(double windowHeight)
+        public MainWindowModel()
         {
             CurrentSubtitle = "This is...\n...just a test";
-            WindowTop = windowHeight - 100;
         }
 
         private string _currentSubtitle;

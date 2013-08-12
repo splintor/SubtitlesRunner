@@ -7,7 +7,7 @@ namespace SubtitlesRunner
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = new MainWindowModel(Height);
+            DataContext = new MainWindowModel();
         }
 
         private void OnCancel(object sender, RoutedEventArgs e)
