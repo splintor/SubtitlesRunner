@@ -1,0 +1,24 @@
+# Directories #
+###############
+Generated/
+obj/
+bin/
+ClientBin/
+x64/
+ipch/
+[Rr]elease*/
+[Dd]ebug*/
+[Tt]est[Rr]esult*
+_ReSharper*
+*.bak
+*.user
+*.opensdf
+*.sdf
+*.suo
+*.sublime-project
+*.log
+*.sqlite
+*.vsmdi
+*.tmp_proj
+
+NDependOut/

@@ -1,0 +1,91 @@
+﻿<Window x:Class="SubtitlesRunner.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:subtitlesRunner="clr-namespace:SubtitlesRunner"
+        Title="MainWindow"
+        WindowStyle="None"
+        WindowState="Maximized"
+        AllowsTransparency="True"
+        Background="Transparent"
+        Topmost="True"
+        x:Name="Root"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance subtitlesRunner:MainWindowModel}">
+    <Grid>
+        <Grid.Margin>
+            <MultiBinding Converter="{subtitlesRunner:WindowTopConverter}">
+                <Binding Path="WindowTop" />
+                <Binding Path="ActualHeight" ElementName="Root" />
+                <Binding Path="ActualHeight" ElementName="ButtonsGrid" />
+                <Binding Path="ActualHeight" ElementName="TitlesGrid" />
+            </MultiBinding>
+        </Grid.Margin>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Button Grid.Column="0"
+                x:Name="MoveGrip" />
+        <Grid Grid.Column="1"
+              HorizontalAlignment="Stretch">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0"
+                  x:Name="ButtonsGrid">
+                <Grid.Resources>
+                    <Style TargetType="{x:Type Button}">
+                        <Setter Property="Height" Value="30" />
+                        <Setter Property="Margin" Value="10 0" />
+                    </Style>
+                </Grid.Resources>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Stretch">
+                    <Button Content="Open..." />
+                    <Button Content="Play" />
+                    <Button Content="Stop" />
+                </StackPanel>
+                <Slider Grid.Column="1"
+                        HorizontalAlignment="Stretch" />
+                <StackPanel Orientation="Horizontal"
+                        Grid.Column="2">
+                    <Button Content="Restore" HorizontalAlignment="Right" />
+                    <Button Content="Close"
+                            HorizontalAlignment="Stretch"
+                            IsCancel="True"
+                            Click="OnCancel" />
+                </StackPanel>
+            </Grid>
+            <Grid MinHeight="100"
+                  x:Name="TitlesGrid"
+                  Grid.Row="1"
+                  HorizontalAlignment="Stretch">
+                <Grid.Style>
+                    <Style TargetType="{x:Type Grid}">
+                        <Setter Property="Background" Value="#01010101" />
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="LightCyan" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <TextBlock VerticalAlignment="Center"
+                           HorizontalAlignment="Stretch"
+                           TextAlignment="Center"
+                           FontSize="60"
+                           Foreground="Blue"
+                           Text="{Binding CurrentSubtitle}" />
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>
