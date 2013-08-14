@@ -38,8 +38,8 @@
                   x:Name="ButtonsGrid">
                 <Grid.Resources>
                     <Style TargetType="{x:Type Button}">
-                        <Setter Property="Height" Value="30" />
-                        <Setter Property="Margin" Value="10 0" />
+                        <Setter Property="Margin" Value="5 0" />
+                        <Setter Property="Padding" Value="3" />
                     </Style>
                 </Grid.Resources>
                 <Grid.ColumnDefinitions>
@@ -50,11 +50,13 @@
                 <StackPanel Grid.Column="0"
                             Orientation="Horizontal"
                             HorizontalAlignment="Stretch">
-                    <Button Content="Open..." />
+                    <Button Content="Open..."
+                            Command="{Binding OpenFileDialogCommand}" />
                     <Button Content="Play" />
                     <Button Content="Stop" />
                 </StackPanel>
                 <Slider Grid.Column="1"
+                        Value="{Binding CurrentTimeInTicks}"
                         HorizontalAlignment="Stretch" />
                 <StackPanel Orientation="Horizontal"
                         Grid.Column="2">
@@ -84,7 +86,7 @@
                            TextAlignment="Center"
                            FontSize="60"
                            Foreground="Blue"
-                           Text="{Binding CurrentSubtitle}" />
+                           Text="{Binding CurrentSubtitle.SubtitleText}" />
             </Grid>
         </Grid>
     </Grid>

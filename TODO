@@ -1,4 +1,3 @@
-- Open file dialog
 - Load srt file
 - Make Play/Pause/Stop work
 - Use graphics instead of text for buttons
@@ -8,3 +7,4 @@
 - Support restore mode
 - Enable colors/font cusomization
 - Show current time in label, and enable micro-decrease/increase
+- Show MRU list in open button (using SplitButton)
