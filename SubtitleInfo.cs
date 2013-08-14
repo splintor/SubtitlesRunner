@@ -11,5 +11,10 @@ namespace SubtitlesRunner
         public string SubtitleText { get; set; }
 
         public int Id { get; set; }
+
+        public override string ToString()
+        {
+            return string.Format("[{0}] {1}--{2}: {3}", Id, StartTime, EndTime, SubtitleText);
+        }
     }
 }

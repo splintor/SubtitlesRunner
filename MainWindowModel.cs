@@ -11,12 +11,15 @@ namespace SubtitlesRunner
 {
     public class MainWindowModel : INotifyPropertyChanged
     {
-        private List<SubtitleInfo> _subTitles;
+        private readonly Logger _logger;
 
         public MainWindowModel()
         {
-            //CurrentSubtitle = "This is...\n...just a test";
+            _logger = new Logger();
+            _logger.Clear();
         }
+
+        private List<SubtitleInfo> _subtitles;
 
         public DateTime CurrentTime
         {
@@ -75,7 +78,7 @@ namespace SubtitlesRunner
                 {
                     CheckFileExists = true,
                     DefaultExt = "srt",
-                    Filter = "Subtitles files (*.srt)|*.srt|All files (*.*)|*.*",
+                    Filter = "SubRip Text files (*.srt)|*.srt|All files (*.*)|*.*",
                     Title = "Select Subtitles File"
                 };
             if (dialog.ShowDialog() == true)
@@ -84,12 +87,84 @@ namespace SubtitlesRunner
             }
         }
 
+        private enum ParseStep
+        {
+            Id,
+            TimeRange,
+            Subtitle,
+        }
+
         private void LoadSubtitlesFile(string fileName)
         {
-            _subTitles = new List<SubtitleInfo>();
-            var lines = File.ReadAllLines(fileName);
+            string[] lines;
 
-            //throw new NotImplementedException();
+            try
+            {
+                lines = File.ReadAllLines(fileName);
+            }
+            catch (Exception exception)
+            {
+                _logger.Exception(exception, "Failed to load subtitles file {0}", fileName);
+                return;
+            }
+
+            _subtitles = new List<SubtitleInfo>();
+            var currentSubtitle = new SubtitleInfo();
+            var currentStep = ParseStep.Id;
+
+            for (int lineCounter = 0; lineCounter < lines.Length; ++lineCounter)
+            {
+                var line = lines[lineCounter];
+                switch (currentStep)
+                {
+                    case ParseStep.Id:
+                        {
+                            int id;
+                            if (int.TryParse(line, out id))
+                            {
+                                currentSubtitle.Id = id;
+                                currentStep = ParseStep.TimeRange;
+                            }
+                            else if (line.Trim().Length > 0) // allow multiple empty lines as separators
+                            {
+                                _logger.Error("SRT File Load error at line {0}: Failed to parse id line: {1}", lineCounter + 1, line);
+                            }
+                        }
+                        break;
+
+                    case ParseStep.TimeRange:
+                        // todo: parse time range
+                        currentStep = ParseStep.Subtitle;
+                        break;
+
+                    case ParseStep.Subtitle:
+                        if (line.Length == 0)
+                        {
+                            _subtitles.Add(currentSubtitle);
+                            _logger.Debug("Parsed step {0}", currentSubtitle);
+                            currentSubtitle = new SubtitleInfo();
+                            currentStep = ParseStep.Id;
+                        }
+                        else
+                        {
+                            if (currentSubtitle.SubtitleText == null)
+                            {
+                                currentSubtitle.SubtitleText = line;
+                            }
+                            else
+                            {
+                                currentSubtitle.SubtitleText = currentSubtitle.SubtitleText + Environment.NewLine + line;
+                            }
+                        }
+                        break;
+                }
+            }
+
+            if (currentSubtitle.Id > 0)
+            {
+                _subtitles.Add(currentSubtitle);
+                _logger.Debug("Parsed last step {0}", currentSubtitle);
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
