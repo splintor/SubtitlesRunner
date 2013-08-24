@@ -175,6 +175,10 @@ namespace SubtitlesRunner
                 _subtitles.Add(currentSubtitle);
                 _logger.Debug("Parsed last step {0}", currentSubtitle);
             }
+
+            // ReSharper disable ExplicitCallerInfoArgument
+            OnPropertyChanged("PlayCommand");
+            // ReSharper restore ExplicitCallerInfoArgument
         }
 
         private TimeSpan ParseTime(string s)
@@ -189,6 +193,44 @@ namespace SubtitlesRunner
 
             return parts.Count == 3 ? new TimeSpan(0, parts[0], parts[1], parts[2])
                                     : new TimeSpan(0, parts[0], parts[1], parts[2], parts[3]);
+        }
+
+        public RelayCommand PlayCommand { get { return new RelayCommand(DoPlayPause, CanPlayPause); } }
+
+        private bool CanPlayPause(object obj)
+        {
+            return _subtitles != null && _subtitles.Count > 0; // todo: disable play/pause after play has finished
+        }
+
+        private void DoPlayPause(object parameter)
+        {
+            // todo: implement play/pause
+            // todo: Update PlayButtonContent when playing/pausing
+        }
+
+        private object _playButtonContent = "Play";
+
+        public object PlayButtonContent
+        {
+            get { return _playButtonContent; }
+            set
+            {
+                if (value.Equals(_playButtonContent)) return;
+                _playButtonContent = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public RelayCommand StopCommand { get { return new RelayCommand(DoStop, CanStop); } }
+
+        private bool CanStop(object obj)
+        {
+            return _subtitles != null && _subtitles.Count > 0; // todo: Disable stop if play hasn't started yet
+        }
+
+        private void DoStop(object obj)
+        {
+            // todo: Implement stop
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

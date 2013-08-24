@@ -52,8 +52,10 @@
                             HorizontalAlignment="Stretch">
                     <Button Content="Open..."
                             Command="{Binding OpenFileDialogCommand}" />
-                    <Button Content="Play" />
-                    <Button Content="Stop" />
+                    <Button Content="{Binding PlayButtonContent}"
+                            Command="{Binding PlayCommand}" />
+                    <Button Content="Stop"
+                            Command="{Binding StopCommand}" />
                 </StackPanel>
                 <Slider Grid.Column="1"
                         Value="{Binding CurrentTimeInTicks}"
