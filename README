@@ -1,3 +1,5 @@
-This project is menat to enable use of subtitle files (*.srt) in streamed video you don't own.
+This project is meant to enable use of subtitle files (*.srt) in streamed video that the user doesn't own.
 
-In such cases, where you can't change the video to add subtitles, Subtitles Runner can be used to display the subtitles on top of the streamed video.
+In such cases, where the user cannot change the video to add subtitles, Subtitles Runner can be used to display the subtitles loaded from a file on top of the streamed video.
+
+The application is not functioning yet (pre-Alpha).
