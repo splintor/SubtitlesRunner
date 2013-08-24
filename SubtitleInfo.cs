@@ -4,9 +4,9 @@ namespace SubtitlesRunner
 {
     public class SubtitleInfo
     {
-        public DateTime StartTime { get; set; }
+        public TimeSpan StartTime { get; set; }
 
-        public DateTime EndTime { get; set; }
+        public TimeSpan EndTime { get; set; }
 
         public string SubtitleText { get; set; }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Microsoft.Win32;
@@ -66,6 +67,7 @@ namespace SubtitlesRunner
         }
 
         private ICommand _openFileDialogCommand;
+        private static readonly string[] TimeRangeSeparator = new[] { "-->" };
 
         public ICommand OpenFileDialogCommand
         {
@@ -133,7 +135,15 @@ namespace SubtitlesRunner
                         break;
 
                     case ParseStep.TimeRange:
-                        // todo: parse time range
+                        var parts = line.Split(TimeRangeSeparator, StringSplitOptions.None);
+                        if (parts.Length < 2)
+                        {
+                            _logger.Error("SRT File Load error at line {0}: Failed to parse time range line: {1}", lineCounter + 1, line);
+                        }
+
+                        currentSubtitle.StartTime = ParseTime(parts[0]);
+                        currentSubtitle.EndTime = ParseTime(parts[1]);
+
                         currentStep = ParseStep.Subtitle;
                         break;
 
@@ -165,6 +175,20 @@ namespace SubtitlesRunner
                 _subtitles.Add(currentSubtitle);
                 _logger.Debug("Parsed last step {0}", currentSubtitle);
             }
+        }
+
+        private TimeSpan ParseTime(string s)
+        {
+            int i;
+            var parts = s.Split(':', ',', '.').Select(p => int.TryParse(p, out i) ? i : -1).ToList();
+            if (parts.Count < 3 || parts.Any(p => p < 0))
+            {
+                _logger.Error("Failed to parse date: ", s);
+                return TimeSpan.Zero;
+            }
+
+            return parts.Count == 3 ? new TimeSpan(0, parts[0], parts[1], parts[2])
+                                    : new TimeSpan(0, parts[0], parts[1], parts[2], parts[3]);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
