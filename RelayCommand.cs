@@ -22,16 +22,20 @@ namespace SubtitlesRunner
 
         #endregion Constructors
 
+        public void RaiseCanExecuteChanged()
+        {
+            if (CanExecuteChanged != null)
+            {
+                CanExecuteChanged(this, EventArgs.Empty);
+            }
+        }
+
         #region ICommand Members
 
         [DebuggerStepThrough]
         public bool CanExecute(object parameter) { return _canExecute == null || _canExecute(parameter); }
 
-        public event EventHandler CanExecuteChanged
-        {
-            add { CommandManager.RequerySuggested += value; }
-            remove { CommandManager.RequerySuggested -= value; }
-        }
+        public event EventHandler CanExecuteChanged;
 
         public void Execute(object parameter)
         {

@@ -52,20 +52,39 @@
                             HorizontalAlignment="Stretch">
                     <Button Content="Open..."
                             Command="{Binding OpenFileDialogCommand}" />
-                    <Button Content="{Binding PlayButtonContent}"
-                            Command="{Binding PlayCommand}" />
+                    <Button Command="{Binding PlayCommand}">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}">
+                                <Setter Property="Content" Value="Play" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsRunning}" Value="True">
+                                        <Setter Property="Content" Value="Pause" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
                     <Button Content="Stop"
                             Command="{Binding StopCommand}" />
                 </StackPanel>
                 <Slider Grid.Column="1"
-                        Value="{Binding CurrentTimeInTicks}"
+                        Minimum="0"
+                        Maximum="{Binding MaximumProgressInTicks}"
+                        Value="{Binding ProgressTimeInTicks}"
+                        IsEnabled="{Binding HasSubtitles}"
+                        IsMoveToPointEnabled="True"
                         HorizontalAlignment="Stretch" />
                 <StackPanel Orientation="Horizontal"
                         Grid.Column="2">
-                    <Button Content="Restore" HorizontalAlignment="Right" />
+                    <TextBlock Text="{Binding ProgressTime, Mode=OneWay, StringFormat=hh\\:mm\\:ss}"
+                               VerticalAlignment="Center"
+                               Margin="5 0" />
+                    <!-- Restore button is hidden for now, until it is supported.-->
+                    <Button Content="Restore"
+                            Visibility="Collapsed" />
                     <Button Content="Close"
-                            HorizontalAlignment="Stretch"
                             IsCancel="True"
+                            Margin="0 0 15 0"
                             Click="OnCancel" />
                 </StackPanel>
             </Grid>
@@ -86,9 +105,10 @@
                 <TextBlock VerticalAlignment="Center"
                            HorizontalAlignment="Stretch"
                            TextAlignment="Center"
+                           Margin="5 0 5 15"
                            FontSize="60"
                            Foreground="Blue"
-                           Text="{Binding CurrentSubtitle.SubtitleText}" />
+                           Text="{Binding SubtitleTextToDisplay}" />
             </Grid>
         </Grid>
     </Grid>

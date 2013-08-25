@@ -4,7 +4,9 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Windows.Input;
+using System.Windows.Threading;
 using Microsoft.Win32;
 using SubtitlesRunner.Annotations;
 
@@ -18,37 +20,94 @@ namespace SubtitlesRunner
         {
             _logger = new Logger();
             _logger.Clear();
+
+            _progressTimer = new DispatcherTimer { Interval = new TimeSpan(0, 0, 0, 0, 100) };
+            _progressTimer.Tick += HandleProgress;
         }
 
         private List<SubtitleInfo> _subtitles;
 
-        public DateTime CurrentTime
-        {
-            get { return new DateTime(CurrentTimeInTicks); }
-        }
+        /// <summary>
+        /// The clock time where progress started
+        /// We need to keep it and constantly compare the current time to this anchor time because we can't rely on the
+        /// <see cref="DispatcherTimer"/> to tick in fixed times.
+        /// </summary>
+        private DateTime _anchorTime;
 
-        private long _currentTimeInTicks;
+        /// <summary>
+        /// The progress offset of <see cref="_anchorTime"/>
+        /// </summary>
+        private TimeSpan _anchorOffset;
 
-        public long CurrentTimeInTicks
+        private TimeSpan _progressTime;
+
+        /// <summary>
+        /// Gets or sets the current progress time.
+        /// </summary>
+        public TimeSpan ProgressTime
         {
-            get { return _currentTimeInTicks; }
+            get { return _progressTime; }
             set
             {
-                if (_currentTimeInTicks == value) return;
-                _currentTimeInTicks = value;
+                if (value == _progressTime) return;
+                _progressTime = value;
+                OnPropertyChanged();
+                // ReSharper disable ExplicitCallerInfoArgument
+                OnPropertyChanged("ProgressTimeInTicks");
+                // ReSharper restore ExplicitCallerInfoArgument
+
+                StopCommand.RaiseCanExecuteChanged();
+
+                // todo: Optimize search for subtitles (if needed)
+                SubtitleTextToDisplay = string.Join("\n",
+                                                    _subtitles.Where(s => s.StartTime <= ProgressTime && ProgressTime <= s.EndTime)
+                                                              .Select(s => s.SubtitleText));
+            }
+        }
+
+        public long ProgressTimeInTicks
+        {
+            get { return _progressTime.Ticks; }
+            set
+            {
+                if (_progressTime.Ticks == value) return;
+                ProgressTime = TimeSpan.FromTicks(value);
+
+                if (!_progressTimer.IsEnabled) return;
+
+                // this setter is usually called from the slider. We need to update our running counters accordingly
+                _anchorOffset = ProgressTime;
+                _anchorTime = DateTime.Now;
+            }
+        }
+
+        private long _maximumProgressInTicks = 100;
+
+        public long MaximumProgressInTicks
+        {
+            get { return _maximumProgressInTicks; }
+            set
+            {
+                if (_maximumProgressInTicks == value) return;
+                _maximumProgressInTicks = value;
                 OnPropertyChanged();
             }
         }
 
-        private SubtitleInfo _currentSubtitle;
-
-        public SubtitleInfo CurrentSubtitle
+        public bool HasSubtitles
         {
-            get { return _currentSubtitle; }
+            get { return _subtitles != null && _subtitles.Count > 0; }
+        }
+
+        private string _subtitleTextToDisplay;
+
+        public string SubtitleTextToDisplay
+        {
+            get { return _subtitleTextToDisplay; }
             set
             {
-                if (value == _currentSubtitle) return;
-                _currentSubtitle = value;
+                if (value == _subtitleTextToDisplay) return;
+                _subtitleTextToDisplay = value;
                 OnPropertyChanged();
             }
         }
@@ -102,7 +161,7 @@ namespace SubtitlesRunner
 
             try
             {
-                lines = File.ReadAllLines(fileName);
+                lines = File.ReadAllLines(fileName, Encoding.Default);
             }
             catch (Exception exception)
             {
@@ -177,8 +236,19 @@ namespace SubtitlesRunner
             }
 
             // ReSharper disable ExplicitCallerInfoArgument
-            OnPropertyChanged("PlayCommand");
+            OnPropertyChanged("HasSubtitles");
             // ReSharper restore ExplicitCallerInfoArgument
+
+            MaximumProgressInTicks = HasSubtitles ? _subtitles.Max(s => s.EndTime.Ticks) : 100;
+            PlayCommand.RaiseCanExecuteChanged();
+            DoStop();
+        }
+
+        private readonly DispatcherTimer _progressTimer;
+
+        private void HandleProgress(object sender, EventArgs e)
+        {
+            ProgressTime = _anchorOffset + (DateTime.Now - _anchorTime);
         }
 
         private TimeSpan ParseTime(string s)
@@ -195,42 +265,76 @@ namespace SubtitlesRunner
                                     : new TimeSpan(0, parts[0], parts[1], parts[2], parts[3]);
         }
 
-        public RelayCommand PlayCommand { get { return new RelayCommand(DoPlayPause, CanPlayPause); } }
+        private RelayCommand _playCommand;
+
+        public RelayCommand PlayCommand
+        {
+            get
+            {
+                return _playCommand ?? (_playCommand = new RelayCommand(DoPlayPause, CanPlayPause));
+            }
+        }
 
         private bool CanPlayPause(object obj)
         {
-            return _subtitles != null && _subtitles.Count > 0; // todo: disable play/pause after play has finished
+            return HasSubtitles; // todo: disable play/pause after play has finished
         }
 
         private void DoPlayPause(object parameter)
         {
-            // todo: implement play/pause
-            // todo: Update PlayButtonContent when playing/pausing
+            DoPlayPause();
         }
 
-        private object _playButtonContent = "Play";
-
-        public object PlayButtonContent
+        private void DoPlayPause()
         {
-            get { return _playButtonContent; }
-            set
+            if (_progressTimer.IsEnabled)
             {
-                if (value.Equals(_playButtonContent)) return;
-                _playButtonContent = value;
-                OnPropertyChanged();
+                _progressTimer.Stop();
+            }
+            else
+            {
+                _anchorOffset = ProgressTime;
+                _anchorTime = DateTime.Now;
+                _progressTimer.Start();
+            }
+
+            // ReSharper disable ExplicitCallerInfoArgument
+            OnPropertyChanged("IsRunning");
+            // ReSharper restore ExplicitCallerInfoArgument
+        }
+
+        public bool IsRunning
+        {
+            get { return _progressTimer.IsEnabled; }
+        }
+
+        private RelayCommand _stopCommand;
+
+        public RelayCommand StopCommand
+        {
+            get
+            {
+                return _stopCommand ?? (_stopCommand = new RelayCommand(DoStop, CanStop));
             }
         }
 
-        public RelayCommand StopCommand { get { return new RelayCommand(DoStop, CanStop); } }
-
         private bool CanStop(object obj)
         {
-            return _subtitles != null && _subtitles.Count > 0; // todo: Disable stop if play hasn't started yet
+            return ProgressTime > TimeSpan.Zero;
         }
 
         private void DoStop(object obj)
         {
-            // todo: Implement stop
+            DoStop();
+        }
+
+        private void DoStop()
+        {
+            if (_progressTimer.IsEnabled)
+            {
+                DoPlayPause();
+            }
+            ProgressTime = TimeSpan.Zero;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

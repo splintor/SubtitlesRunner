@@ -2,4 +2,4 @@ This project is meant to enable use of subtitle files (*.srt) in streamed video 
 
 In such cases, where the user cannot change the video to add subtitles, Subtitles Runner can be used to display the subtitles loaded from a file on top of the streamed video.
 
-The application is not functioning yet (pre-Alpha).
+The application is Alpha stage - basic functionality works, but there is still lots of work to make it really usable.
