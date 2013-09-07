@@ -24,7 +24,7 @@ namespace SubtitlesRunner
             }
         }
 
-        public bool IsDebugMode { get; set; }
+        public bool IsDebugMode { get { return AppStartupOptions.DebugMode; } }
 
         public void Debug(string s, params object[] parameters)
         {

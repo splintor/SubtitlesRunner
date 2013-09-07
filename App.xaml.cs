@@ -1,17 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace SubtitlesRunner
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
-    public partial class App : Application
+    public partial class App
     {
+        private readonly Logger _logger = new Logger();
+
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+            try
+            {
+                AppStartupOptions.ProcessArgs(e.Args);
+            }
+            catch (Exception ex)
+            {
+                _logger.Exception(ex, "Processing failed for command line {0}", string.Join(" ", e.Args));
+            }
+        }
     }
 }

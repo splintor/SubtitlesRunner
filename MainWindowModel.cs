@@ -23,6 +23,18 @@ namespace SubtitlesRunner
 
             _progressTimer = new DispatcherTimer { Interval = new TimeSpan(0, 0, 0, 0, 100) };
             _progressTimer.Tick += HandleProgress;
+
+            if (AppStartupOptions.SRTFileToLoad != null)
+            {
+                if (!File.Exists(AppStartupOptions.SRTFileToLoad))
+                {
+                    _logger.Error("Specified file ({0}) does not exist", AppStartupOptions.SRTFileToLoad);
+                }
+                else
+                {
+                    LoadSubtitlesFile(AppStartupOptions.SRTFileToLoad);
+                }
+            }
         }
 
         private List<SubtitleInfo> _subtitles;

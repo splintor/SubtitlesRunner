@@ -1,12 +1,12 @@
-- Have startup options:
-	- debug mode
-	- file to load (and position)
+- Hide controls when in play mode and mouse is not on them
 - Use graphics instead of text for buttons
 - Use string resources
 - Enable dragging move grip to change app location
 - Have better UI for move grip
 - Support restore mode (also from startup)
 - Enable colors/font customization (also from startup)
+- Enable loading file into position from startup
+- Enable translating titles using Google Translate and/or other services
 - Show current time in label, and enable micro-decrease/increase
 - Show MRU list in open button (using SplitButton)
 - Slider tooltip on hover and drag
