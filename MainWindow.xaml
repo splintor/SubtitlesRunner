@@ -13,7 +13,7 @@
         x:Name="Root"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance subtitlesRunner:MainWindowModel}">
-    <Grid>
+    <Grid x:Name="MainGrid">
         <Grid.Margin>
             <MultiBinding Converter="{subtitlesRunner:WindowTopConverter}">
                 <Binding Path="WindowTop" />
@@ -30,6 +30,17 @@
                 x:Name="MoveGrip" />
         <Grid Grid.Column="1"
               HorizontalAlignment="Stretch">
+            <Grid.Style>
+                <Style TargetType="{x:Type Grid}">
+                    <Setter Property="Background" Value="#01010101" />
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="Beige" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -42,6 +53,32 @@
                         <Setter Property="Padding" Value="3" />
                     </Style>
                 </Grid.Resources>
+                <Grid.Style>
+                    <Style TargetType="{x:Type Grid}">
+                        <Style.Triggers>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding IsMouseOver, ElementName=MainGrid}" Value="False" />
+                                    <Condition Binding="{Binding IsRunning}" Value="True" />
+                                </MultiDataTrigger.Conditions>
+                                <MultiDataTrigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:4" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </MultiDataTrigger.EnterActions>
+                                <MultiDataTrigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:1" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </MultiDataTrigger.ExitActions>
+                            </MultiDataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
@@ -92,16 +129,6 @@
                   x:Name="TitlesGrid"
                   Grid.Row="1"
                   HorizontalAlignment="Stretch">
-                <Grid.Style>
-                    <Style TargetType="{x:Type Grid}">
-                        <Setter Property="Background" Value="#01010101" />
-                        <Style.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="LightCyan" />
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </Grid.Style>
                 <TextBlock VerticalAlignment="Center"
                            HorizontalAlignment="Stretch"
                            TextAlignment="Center"
