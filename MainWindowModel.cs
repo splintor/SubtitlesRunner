@@ -330,6 +330,19 @@ namespace SubtitlesRunner
             }
         }
 
+        private bool _isOptionsDisplayed;
+
+        public bool IsOptionsDisplayed
+        {
+            get { return _isOptionsDisplayed; }
+            set
+            {
+                if (_isOptionsDisplayed == value) return;
+                _isOptionsDisplayed = value;
+                OnPropertyChanged();
+            }
+        }
+
         private bool CanStop(object obj)
         {
             return ProgressTime > TimeSpan.Zero;

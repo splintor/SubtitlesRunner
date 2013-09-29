@@ -13,6 +13,9 @@
         x:Name="Root"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance subtitlesRunner:MainWindowModel}">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </Window.Resources>
     <Grid x:Name="MainGrid">
         <Grid.Margin>
             <MultiBinding Converter="{subtitlesRunner:WindowTopConverter}">
@@ -37,6 +40,9 @@
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Background" Value="Beige" />
                         </Trigger>
+                        <DataTrigger Binding="{Binding IsOptionsDisplayed}" Value="True">
+                            <Setter Property="Background" Value="Beige" />
+                        </DataTrigger>
                     </Style.Triggers>
                 </Style>
             </Grid.Style>
@@ -52,6 +58,10 @@
                         <Setter Property="Margin" Value="5 0" />
                         <Setter Property="Padding" Value="3" />
                     </Style>
+                    <Style TargetType="{x:Type ToggleButton}">
+                        <Setter Property="Margin" Value="5 0" />
+                        <Setter Property="Padding" Value="3" />
+                    </Style>
                 </Grid.Resources>
                 <Grid.Style>
                     <Style TargetType="{x:Type Grid}">
@@ -60,6 +70,7 @@
                                 <MultiDataTrigger.Conditions>
                                     <Condition Binding="{Binding IsMouseOver, ElementName=MainGrid}" Value="False" />
                                     <Condition Binding="{Binding IsRunning}" Value="True" />
+                                    <Condition Binding="{Binding IsOptionsDisplayed}" Value="False" />
                                 </MultiDataTrigger.Conditions>
                                 <MultiDataTrigger.EnterActions>
                                     <BeginStoryboard>
@@ -89,6 +100,8 @@
                             HorizontalAlignment="Stretch">
                     <Button Content="Open..."
                             Command="{Binding OpenFileDialogCommand}" />
+                    <ToggleButton Content="Options..."
+                                  IsChecked="{Binding IsOptionsDisplayed}" />
                     <Button Command="{Binding PlayCommand}">
                         <Button.Style>
                             <Style TargetType="{x:Type Button}">
@@ -110,6 +123,7 @@
                         Value="{Binding ProgressTimeInTicks}"
                         IsEnabled="{Binding HasSubtitles}"
                         IsMoveToPointEnabled="True"
+                        VerticalAlignment="Center"
                         HorizontalAlignment="Stretch" />
                 <StackPanel Orientation="Horizontal"
                         Grid.Column="2">
@@ -136,6 +150,33 @@
                            FontSize="60"
                            Foreground="Blue"
                            Text="{Binding SubtitleTextToDisplay}" />
+                <Border Background="LightBlue"
+                        Visibility="{Binding IsOptionsDisplayed, Converter={StaticResource BooleanToVisibilityConverter}}"
+                        Grid.Row="1"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Padding="0 0 0 5"
+                        Margin="5 5 5 15"
+                        Width="200">
+                    <DockPanel LastChildFill="True">
+                        <Grid DockPanel.Dock="Top"
+                              Background="Blue">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Label Content="Options" />
+                            <ToggleButton Content="X"
+                                          Grid.Column="1"
+                                          IsChecked="{Binding IsOptionsDisplayed}" />
+                        </Grid>
+                        <StackPanel>
+                            <Label Content="Font: " />
+                            <Label Content="Font Size: " />
+                            <Label Content="Color: " />
+                        </StackPanel>
+                    </DockPanel>
+                </Border>
             </Grid>
         </Grid>
     </Grid>

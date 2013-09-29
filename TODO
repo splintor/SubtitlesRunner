@@ -1,9 +1,9 @@
+- Enable colors/font customization (also from startup)
 - Enable dragging move grip to change app location
 - Use graphics instead of text for buttons
 - Use string resources
 - Have better UI for move grip
 - Support restore mode (also from startup)
-- Enable colors/font customization (also from startup)
 - Enable loading file into position from startup
 - Enable translating titles using Google Translate and/or other services
 - Enable micro-decrease/increase
