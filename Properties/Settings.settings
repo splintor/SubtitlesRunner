@@ -1,7 +1,12 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="uri:settings" CurrentProfile="(Default)">
-  <Profiles>
-    <Profile Name="(Default)" />
-  </Profiles>
-  <Settings />
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="SubtitlesRunner.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="SubtitlesColor" Type="System.Windows.Media.Color" Scope="User">
+      <Value Profile="(Default)">#FF0000FF</Value>
+    </Setting>
+    <Setting Name="SubtitlesFont" Type="System.Drawing.Font" Scope="User">
+      <Value Profile="(Default)">Segoe UI, 48pt</Value>
+    </Setting>
+  </Settings>
 </SettingsFile>

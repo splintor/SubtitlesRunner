@@ -1,14 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 using Microsoft.Win32;
 using SubtitlesRunner.Annotations;
+using SubtitlesRunner.Properties;
+using Color = System.Windows.Media.Color;
 
 namespace SubtitlesRunner
 {
@@ -20,6 +24,9 @@ namespace SubtitlesRunner
         {
             _logger = new Logger();
             _logger.Clear();
+
+            SubtitlesColor = Settings.Default.SubtitlesColor;
+            SubtitlesFont = Settings.Default.SubtitlesFont;
 
             _progressTimer = new DispatcherTimer { Interval = new TimeSpan(0, 0, 0, 0, 100) };
             _progressTimer.Tick += HandleProgress;
@@ -35,6 +42,46 @@ namespace SubtitlesRunner
                     LoadSubtitlesFile(AppStartupOptions.SRTFileToLoad);
                 }
             }
+        }
+
+        private Font _subtitlesFont;
+
+        public Font SubtitlesFont
+        {
+            get { return _subtitlesFont; }
+            set
+            {
+                if (Equals(_subtitlesFont, value)) return;
+                _subtitlesFont = value;
+                OnPropertyChanged();
+                // ReSharper disable ExplicitCallerInfoArgument
+                OnPropertyChanged("SubtitlesFontDescription");
+                // ReSharper restore ExplicitCallerInfoArgument
+                Settings.Default.SubtitlesFont = value;
+                Settings.Default.Save();
+            }
+        }
+
+        public string SubtitlesFontDescription
+        {
+            get
+            {
+                var f = SubtitlesFont;
+                var style = string.Join(", ", MaskToList<FontStyle>(f.Style).Select(s => s.ToString()));
+                if (style.Length > 0) style = " (" + style + ")";
+                return f.FontFamily.Name + ", " + f.Size + style;
+            }
+        }
+
+        public static IEnumerable<T> MaskToList<T>(Enum mask)
+        {
+            if (typeof(T).IsSubclassOf(typeof(Enum)) == false)
+                throw new ArgumentException();
+
+            return Enum.GetValues(typeof(T))
+                                 .Cast<Enum>()
+                                 .Where(mask.HasFlag)
+                                 .Cast<T>();
         }
 
         private List<SubtitleInfo> _subtitles;
@@ -341,6 +388,37 @@ namespace SubtitlesRunner
                 _isOptionsDisplayed = value;
                 OnPropertyChanged();
             }
+        }
+
+        private Color _subtitlesColor;
+
+        public Color SubtitlesColor
+        {
+            get { return _subtitlesColor; }
+            set
+            {
+                if (_subtitlesColor == value) return;
+                _subtitlesColor = value;
+                OnPropertyChanged();
+                // ReSharper disable ExplicitCallerInfoArgument
+                OnPropertyChanged("SubtitlesColorBrush");
+                // ReSharper restore ExplicitCallerInfoArgument
+                Settings.Default.SubtitlesColor = value;
+                Settings.Default.Save();
+            }
+        }
+
+        public SolidColorBrush SubtitlesColorBrush { get { return new SolidColorBrush(SubtitlesColor); } }
+
+        public ICommand OpenFontSelectorCommand
+        {
+            get { return new RelayCommand(OpenFontSelector); }
+        }
+
+        private void OpenFontSelector(object obj)
+        {
+            var fontChooser = new FontChooser();
+            fontChooser.ShowDialog();
         }
 
         private bool CanStop(object obj)

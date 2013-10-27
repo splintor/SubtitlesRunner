@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:subtitlesRunner="clr-namespace:SubtitlesRunner"
+        xmlns:subtitlesRunner="clr-namespace:SubtitlesRunner" xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         Title="MainWindow"
         WindowStyle="None"
         WindowState="Maximized"
@@ -147,20 +147,22 @@
                            HorizontalAlignment="Stretch"
                            TextAlignment="Center"
                            Margin="5 0 5 15"
-                           FontSize="60"
-                           Foreground="Blue"
-                           Text="{Binding SubtitleTextToDisplay}" />
+                           FontSize="{Binding SubtitlesFont.Size}"
+                           FontFamily="{Binding SubtitlesFont.FontFamily}"
+                           FontStyle="{Binding SubtitlesFont.Style}"
+                           Foreground="{Binding SubtitlesColorBrush}"
+                           Text="{Binding SubtitleTextToDisplay}">
+                </TextBlock>
                 <Border Background="LightBlue"
                         Visibility="{Binding IsOptionsDisplayed, Converter={StaticResource BooleanToVisibilityConverter}}"
                         Grid.Row="1"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         Padding="0 0 0 5"
-                        Margin="5 5 5 15"
-                        Width="200">
+                        Margin="5 5 5 15">
                     <DockPanel LastChildFill="True">
                         <Grid DockPanel.Dock="Top"
-                              Background="Blue">
+                              Background="#28C761">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
@@ -170,11 +172,43 @@
                                           Grid.Column="1"
                                           IsChecked="{Binding IsOptionsDisplayed}" />
                         </Grid>
-                        <StackPanel>
-                            <Label Content="Font: " />
-                            <Label Content="Font Size: " />
-                            <Label Content="Color: " />
-                        </StackPanel>
+                        <Grid Margin="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Label Grid.Row="0"
+                                   Content="Subtitles Font: "
+                                   VerticalAlignment="Center"
+                                   Margin="0 0 0 5" />
+                            <StackPanel Orientation="Horizontal"
+                                        Grid.Row="0"
+                                        Grid.Column="1"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Center">
+                                <Label HorizontalAlignment="Left"
+                                       VerticalAlignment="Center"
+                                       Content="{Binding SubtitlesFont}" />
+                                <Button Content="Select..."
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center"
+                                        Command="{Binding OpenFontSelectorCommand}" />
+                            </StackPanel>
+                            <Label Grid.Row="1"
+                                   Content="Subtitles Color: "
+                                   VerticalAlignment="Center" />
+                            <xctk:ColorPicker Grid.Row="1"
+                                              Grid.Column="1"
+                                              VerticalAlignment="Center"
+                                              SelectedColor="{Binding SubtitlesColor}"
+                                              DisplayColorAndName="True" />
+                        </Grid>
                     </DockPanel>
                 </Border>
             </Grid>
